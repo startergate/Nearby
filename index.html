@@ -16,20 +16,75 @@
           }
         }
       }
-
     </script>
+    <style>
+      body {
+        margin: 0px 0px 0px 0px;
+      }
+       /* Set the size of the div element that contains the map */
+      #map {
+        height: 100vh;  /* The height is 400 pixels */
+        width: 100vw;  /* The width is the width of the web page */
+      }
+      .depth-1 {
+        position: fixed;
+        z-index: 1;
+      }
+      .depth-20 {
+        position: fixed;
+        z-index: 20;
+      }
+      .nearbyInput {
+        border: 0;
+        padding: 10px 10px 10px 10px;
+        width: calc(50vh);
+        text-align: center;
+      }
+    </style>
   </head>
   <body>
-    <form action="" method="GET">
-      <script type="text/javascript">
-        if (getParameters("gloc")) {
-          document.write("<input type='text' name='gloc' value='' placeholder='위치'>");
-        }
-        if (getParameters("gpls")) {
-          document.write("<input type='text' name='gpls' value='' placeholder='검색'>");
-        }
-      </script>
-      <input type="text" name="gpls" value="" placeholder="검색">
+    <form class="depth-20" action="" method="GET">
+      <div>
+        <script type="text/javascript">
+          if (getParameters("gloc") !== "undefined") {
+            document.writeln("<input type='text' name='gloc' class='nearbyInput location' value='" + getParameters("gloc") + "' placeholder='위치'>");
+          } else {
+            document.writeln("<input type='text' name='gloc' class='nearbyInput location' value='' placeholder='위치'>");
+          }
+        </script>
+        <button type="submit">여기요!</button>
+      </div>
+      <div>
+        <script>
+          if (getParameters("gpls") !== "undefined") {
+            document.writeln("<input type='text' name='gpls' class='nearbyInput search' value='" + getParameters("gpls") + "' placeholder='검색'>");
+          } else {
+            document.writeln("<input type='text' name='gpls' class='nearbyInput search' value='' placeholder='검색'>");
+          }
+        </script>
+        <button type="submit">여기요!</button>
+      </div>
     </form>
+    <div class="depth-1" id="map"></div>
+    <script>
+// Initialize and add the map
+function initMap() {
+  // The location of Uluru
+  var uluru = {lat: -25.344, lng: 131.036};
+  // The map, centered at Uluru
+  var map = new google.maps.Map(
+      document.getElementById('map'), {zoom: 4, center: uluru});
+  // The marker, positioned at Uluru
+  var marker = new google.maps.Marker({position: uluru, map: map});
+}
+    </script>
+    <!--Load the API from the specified URL
+    * The async attribute allows the browser to render the page while the API loads
+    * The key parameter will contain your own API key (which is not needed for this tutorial)
+    * The callback parameter executes the initMap() function
+    -->
+    <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD09uANmgjeKZPBoOnGUYV2vkr4-ISXawo&callback=initMap">
+    </script>
   </body>
 </html>
