@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <script type="text/javascript">
+      function getParameters(paramName) {
+        var returnValue
+        var url = location.href
+        var parameters = (url.slice((url.indexOf('?')) + 1, url.length)).split('&')
+        for (var i = 0; i < parameters.length; i++) {
+          var varName = parameters[i].split('=')[0]
+          if (varName.toUpperCase == paramName.toUpperCase) {
+            returnValue = parameters[i].split('=')[1]
+            return decodeURIComponent(returnValue)
+          }
+        }
+      }
+
+    </script>
+  </head>
+  <body>
+    <form action="" method="GET">
+      <script type="text/javascript">
+        if (getParameters("gloc")) {
+          document.write("<input type='text' name='gloc' value='' placeholder='위치'>");
+        }
+        if (getParameters("gpls")) {
+          document.write("<input type='text' name='gpls' value='' placeholder='검색'>");
+        }
+      </script>
+      <input type="text" name="gpls" value="" placeholder="검색">
+    </form>
+  </body>
+</html>
