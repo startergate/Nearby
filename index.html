@@ -10,8 +10,9 @@
         var parameters = (url.slice((url.indexOf('?')) + 1, url.length)).split('&')
         for (var i = 0; i < parameters.length; i++) {
           var varName = parameters[i].split('=')[0]
-          if (varName.toUpperCase == paramName.toUpperCase) {
+          if (varName.toUpperCase() === paramName.toUpperCase()) {
             returnValue = parameters[i].split('=')[1]
+            console.log(decodeURIComponent(returnValue) + " " + paramName.toUpperCase() + " " + varName.toUpperCase())
             return decodeURIComponent(returnValue)
           }
         }
@@ -20,6 +21,7 @@
     <style>
       body {
         margin: 0px 0px 0px 0px;
+        text-align: center;
       }
        /* Set the size of the div element that contains the map */
       #map {
@@ -44,7 +46,7 @@
   </head>
   <body>
     <form class="depth-20" action="" method="GET">
-      <div>
+      <div class="nearbyDiv">
         <script type="text/javascript">
           if (getParameters("gloc") !== "undefined") {
             document.writeln("<input type='text' name='gloc' class='nearbyInput location' value='" + getParameters("gloc") + "' placeholder='위치'>");
@@ -54,7 +56,7 @@
         </script>
         <button type="submit">여기요!</button>
       </div>
-      <div>
+      <div class="nearbyDiv">
         <script>
           if (getParameters("gpls") !== "undefined") {
             document.writeln("<input type='text' name='gpls' class='nearbyInput search' value='" + getParameters("gpls") + "' placeholder='검색'>");
