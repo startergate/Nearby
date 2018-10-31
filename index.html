@@ -12,7 +12,6 @@
           var varName = parameters[i].split('=')[0]
           if (varName.toUpperCase() === paramName.toUpperCase()) {
             returnValue = parameters[i].split('=')[1]
-            console.log(decodeURIComponent(returnValue) + " " + paramName.toUpperCase() + " " + varName.toUpperCase())
             return decodeURIComponent(returnValue)
           }
         }
@@ -21,7 +20,6 @@
     <style>
       body {
         margin: 0px 0px 0px 0px;
-        text-align: center;
       }
        /* Set the size of the div element that contains the map */
       #map {
@@ -38,53 +36,82 @@
       }
       .nearbyInput {
         border: 0;
-        padding: 10px 10px 10px 10px;
-        width: calc(50vh);
+        padding: 15px 10px 15px 10px;
+        width: 50vw;
         text-align: center;
+        font-size: 20px
+      }
+      .nearbyDiv {
+        position: fixed;
+        margin-left: 25vw;
+      }
+      .nearbyBtn {
+        margin-left: 30px;
+        padding: 10px 20px 10px 20px;
+        margin-bottom: 7px;
+        border: 1px solid #3d414d;
+        color: white;
+        background-color: #3d414d;
+      }
+      .firstInput {
+        top: 30px;
+      }
+      .secondInput {
+        bottom: 30px;
       }
     </style>
   </head>
   <body>
     <form class="depth-20" action="" method="GET">
-      <div class="nearbyDiv">
+      <div class="nearbyDiv firstInput">
         <script type="text/javascript">
           if (getParameters("gloc") !== "undefined") {
-            document.writeln("<input type='text' name='gloc' class='nearbyInput location' value='" + getParameters("gloc") + "' placeholder='위치'>");
+            document.writeln("<input type='text' name='gloc' class='nearbyInput' id='locationInput' value='" + getParameters("gloc") + "' placeholder='위치'>");
           } else {
-            document.writeln("<input type='text' name='gloc' class='nearbyInput location' value='' placeholder='위치'>");
+            document.writeln("<input type='text' name='gloc' class='nearbyInput' id='locationInput' value='' placeholder='위치'>");
           }
         </script>
-        <button type="submit">여기요!</button>
+        <button type="submit" class="nearbyBtn" id="locationBtn" style="display: none;">여기요!</button>
       </div>
-      <div class="nearbyDiv">
+      <div class="nearbyDiv secondInput">
         <script>
           if (getParameters("gpls") !== "undefined") {
-            document.writeln("<input type='text' name='gpls' class='nearbyInput search' value='" + getParameters("gpls") + "' placeholder='검색'>");
+            document.writeln("<input type='text' name='gpls' class='nearbyInput' id='placeInput' value='" + getParameters("gpls") + "' placeholder='검색'>");
           } else {
-            document.writeln("<input type='text' name='gpls' class='nearbyInput search' value='' placeholder='검색'>");
+            document.writeln("<input type='text' name='gpls' class='nearbyInput' id='placeInput' value='' placeholder='검색'>");
           }
         </script>
-        <button type="submit">여기요!</button>
+        <button type="submit" class="nearbyBtn" id="placeBtn" style="display: none;">여기요!</button>
       </div>
     </form>
     <div class="depth-1" id="map"></div>
     <script>
-// Initialize and add the map
-function initMap() {
-  // The location of Uluru
-  var uluru = {lat: -25.344, lng: 131.036};
-  // The map, centered at Uluru
-  var map = new google.maps.Map(
-      document.getElementById('map'), {zoom: 4, center: uluru});
-  // The marker, positioned at Uluru
-  var marker = new google.maps.Marker({position: uluru, map: map});
-}
+  // Initialize and add the map
+      function initMap() {
+        var location = {lat: 35.142839, lng: 126.800090};
+        var map = new google.maps.Map(
+      document.getElementById('map'), {zoom: 17.5, center: location});
+        var marker = new google.maps.Marker({position: location, map: map});
+      }
+      window.onload = function() {
+        if (document.getElementById('locationInput').innerHTML !== "") {
+          document.getElementById('locationBtn').style.display = "";
+        }
+        console.log(document.getElementById('locationInput').innerHTML);
+      };
+
+      document.getElementById('locationInput').addEventListener("click", function() {
+        if (document.getElementById('locationInput').innerHTML) {
+          document.getElementById('locationBtn').style.display = "";
+        }
+      });
+      document.getElementById('locationInput').addEventListener("change", function() {
+        document.getElementById('locationBtn').style.display = "";
+      });
+      document.getElementById('placeInput').addEventListener("change", function() {
+        document.getElementById('placeBtn').style.display = "";
+      });
     </script>
-    <!--Load the API from the specified URL
-    * The async attribute allows the browser to render the page while the API loads
-    * The key parameter will contain your own API key (which is not needed for this tutorial)
-    * The callback parameter executes the initMap() function
-    -->
     <script async defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD09uANmgjeKZPBoOnGUYV2vkr4-ISXawo&callback=initMap">
     </script>
