@@ -94,22 +94,23 @@
         var marker = new google.maps.Marker({position: location, map: map});
       }
       window.onload = function() {
-        if (document.getElementById('locationInput').innerHTML !== "") {
+        if (document.getElementById('locationInput').value !== "") {
           document.getElementById('locationBtn').style.display = "";
         }
-        console.log(document.getElementById('locationInput').innerHTML);
+        if (document.getElementById('placeInput').value !== "") {
+          document.getElementById('placeBtn').style.display = "";
+        }
+        console.log(document.getElementById('locationInput').value);
       };
-
-      document.getElementById('locationInput').addEventListener("click", function() {
-        if (document.getElementById('locationInput').innerHTML) {
+      document.getElementById('locationInput').addEventListener("change", function() {
+        if (document.getElementById('locationInput').value !== "") {
           document.getElementById('locationBtn').style.display = "";
         }
-      });
-      document.getElementById('locationInput').addEventListener("change", function() {
-        document.getElementById('locationBtn').style.display = "";
       });
       document.getElementById('placeInput').addEventListener("change", function() {
-        document.getElementById('placeBtn').style.display = "";
+        if (document.getElementById('placeInput').value !== "") {
+          document.getElementById('placeBtn').style.display = "";
+        }
       });
     </script>
     <script async defer
