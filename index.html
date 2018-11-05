@@ -52,6 +52,12 @@
         border: 1px solid #3d414d;
         color: white;
         background-color: #3d414d;
+        -webkit-transition: background-color 1s, border 1s, -webkit-transform 1s;
+        transition: background-color 1s, border 1s, transform 1s;
+      }
+      .nearbyBtn:hover {
+        border: 1px solid #666e87;
+        background-color: #666e87;
       }
       .firstInput {
         top: 30px;
@@ -60,12 +66,16 @@
         bottom: 30px;
       }
     </style>
+    <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD09uANmgjeKZPBoOnGUYV2vkr4-ISXawo&callback=initMap&libraries=places">
+    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   </head>
   <body>
-    <form class="depth-20" action="" method="GET">
+    <form class="depth-20" id='form' action="" method="GET">
       <div class="nearbyDiv firstInput">
         <script type="text/javascript">
-          if (getParameters("gloc") !== "undefined") {
+          if (typeof getParameters("gloc") != "undefined") {
             document.writeln("<input type='text' name='gloc' class='nearbyInput' id='locationInput' value='" + getParameters("gloc") + "' placeholder='위치'>");
           } else {
             document.writeln("<input type='text' name='gloc' class='nearbyInput' id='locationInput' value='' placeholder='위치'>");
@@ -75,7 +85,7 @@
       </div>
       <div class="nearbyDiv secondInput">
         <script>
-          if (getParameters("gpls") !== "undefined") {
+          if (typeof getParameters("gpls") != "undefined") {
             document.writeln("<input type='text' name='gpls' class='nearbyInput' id='placeInput' value='" + getParameters("gpls") + "' placeholder='검색'>");
           } else {
             document.writeln("<input type='text' name='gpls' class='nearbyInput' id='placeInput' value='' placeholder='검색'>");
@@ -86,21 +96,106 @@
     </form>
     <div class="depth-1" id="map"></div>
     <script>
+    var geocoder, map, infoWindow, service, globalLocation;
   // Initialize and add the map
-      function initMap() {
-        var location = {lat: 35.142839, lng: 126.800090};
-        var map = new google.maps.Map(
-      document.getElementById('map'), {zoom: 17.5, center: location});
+      function initMap(location) {
+        console.log(location + "sdfsdf")
+        map = new google.maps.Map(
+          document.getElementById('map'),
+          {zoom: 17.5, center: location, zoomControl: false, mapTypeControl: false, scaleControl: false, streetViewControl: false, fullscreenControl: false},
+        );
+        var marker = new google.maps.Marker({position: location, map: map});
+        infowindow = new google.maps.InfoWindow();
+        service = new google.maps.places.PlacesService(map);
+        globalLocation = new google.maps.LatLng(35.8026689, 125.6301435);
+      }
+      function setMapOnAll(map) {
+        for (var i = 0; i < markers.length; i++) {
+          markers[i].setMap(map);
+        }
+      }
+      function callback(results, status) {
+      if (status === google.maps.places.PlacesServiceStatus.OK) {
+        for (var i = 0; i < results.length; i++) {
+          createMarker(results[i]);
+        }
+      }
+      }
+      function createMap() {
+
+        var location = {lat:35.8026689,lng:125.6301435};
+        map = new google.maps.Map(
+          document.getElementById('map'),
+          {zoom: 3, center: location, zoomControl: false, mapTypeControl: false, scaleControl: false, streetViewControl: false, fullscreenControl: false},
+        );
         var marker = new google.maps.Marker({position: location, map: map});
       }
+      $("form").on("submit", function(event) {
+        event.preventDefault();
+        mapchange("sdfjklsdfjlk");
+        console.log(document.getElementById('placeInput').value);
+        if (document.getElementById('placeInput').value) {
+          findPlace(document.getElementById('placeInput').value);
+        }
+      });
+      function findPlace(place) {
+        service.nearbySearch({
+          location: { lat : globalLocation.lat(), lng:globalLocation.lng() },
+          radius: 500,
+          type: place
+        }, callback);
+      }
+      function mapchange(delta = null) {
+        if (delta === null) {
+          gloc = getParameters('gloc');
+        } else {
+          gloc = document.getElementById('locationInput').value;
+          console.log(gloc);
+        }
+        if (typeof gloc != "undefined") {
+          if (gloc.split(',').length == 2) {
+            initMap({lat: gloc.split(',')[0], lng: gloc.split(',')[1]});
+          } else {
+            geocoder.geocode( { 'address': gloc }, function(results, status) {
+              if (status == 'OK') {
+                globalLocation = results[0].geometry.location;
+                map.setCenter(results[0].geometry.location);
+                var marker = new google.maps.Marker({
+                  map: map,
+                  position: results[0].geometry.location
+                });
+              }
+            });
+          }
+        } else {
+          initMap({lat: 35.142839, lng: 126.800090});
+        }
+      }
+      function createMarker(place) {
+              var placeLoc = place.geometry.location;
+              var marker = new google.maps.Marker({
+                map: map,
+                position: place.geometry.location
+              });
+
+              google.maps.event.addListener(marker, 'click', function() {
+                infowindow.setContent(place.name);
+                infowindow.open(map, this);
+              });
+            }
       window.onload = function() {
+        geocoder = new google.maps.Geocoder();
+
+        console.log("window ready");
+        console.log('https://maps.googleapis.com/maps/api/geocode/json?address='+getParameters("gloc")+'&key=AIzaSyD09uANmgjeKZPBoOnGUYV2vkr4-ISXawo');
+
+        mapchange();
         if (document.getElementById('locationInput').value !== "") {
           document.getElementById('locationBtn').style.display = "";
         }
         if (document.getElementById('placeInput').value !== "") {
           document.getElementById('placeBtn').style.display = "";
         }
-        console.log(document.getElementById('locationInput').value);
       };
       document.getElementById('locationInput').addEventListener("change", function() {
         if (document.getElementById('locationInput').value !== "") {
@@ -112,9 +207,6 @@
           document.getElementById('placeBtn').style.display = "";
         }
       });
-    </script>
-    <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD09uANmgjeKZPBoOnGUYV2vkr4-ISXawo&callback=initMap">
     </script>
   </body>
 </html>
