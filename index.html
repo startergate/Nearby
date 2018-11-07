@@ -34,6 +34,11 @@
         position: fixed;
         z-index: 20;
       }
+      .depth-30 {
+        margin-top: 150px;
+        position: fixed;
+        z-index: 30;
+      }
       .nearbyInput {
         border: 0;
         padding: 15px 10px 15px 10px;
@@ -65,6 +70,31 @@
       .secondInput {
         bottom: 30px;
       }
+      .list {
+        position:fixed;
+        padding: 10px 0px 10px 0px;
+        margin: 0 auto;
+        width: 300px;
+        background-color: white;
+        right: -290px;
+        border-top-left-radius: 3px;
+        border-bottom-left-radius: 3px;
+        -webkit-transition: right 1s, -webkit-transform 1s;
+        transition: right 1s, transform 1s;
+      }
+      .list:hover {
+        right: 0px;
+      }
+      .list li {
+        list-style: none;
+        padding: 5px 10px 5px 10px;
+        border: 1px solid rgb(209, 213, 218);
+        -webkit-transition: background-color 1s, -webkit-transform 1s;
+        transition: background-color 1s, transform 1s;
+      }
+      .list li:hover {
+        background-color: rgb(209, 213, 218);
+      }
     </style>
     <script async defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD09uANmgjeKZPBoOnGUYV2vkr4-ISXawo&callback=initMap&libraries=places">
@@ -94,6 +124,9 @@
         <button type="submit" class="nearbyBtn" id="placeBtn" style="display: none;">여기요!</button>
       </div>
     </form>
+    <div class='depth-30' id='list'>
+
+    </div>
     <div class="depth-1" id="map"></div>
     <script>
     var geocoder, map, infoWindow, service, globalLocation;
@@ -109,16 +142,17 @@
         service = new google.maps.places.PlacesService(map);
         globalLocation = new google.maps.LatLng(35.8026689, 125.6301435);
       }
-      function setMapOnAll(map) {
-        for (var i = 0; i < markers.length; i++) {
-          markers[i].setMap(map);
-        }
-      }
       function callback(results, status) {
       if (status === google.maps.places.PlacesServiceStatus.OK) {
         for (var i = 0; i < results.length; i++) {
           createMarker(results[i]);
         }
+        var output = '<ul class="list">';
+        for (var i = 0; i < results.length; i++) {
+          output += "<li>"+results[i].name+"</li>";
+        }
+        output += '</ul>';
+        document.getElementById('list').innerHTML = output;
       }
       }
       function createMap() {
