@@ -2,7 +2,7 @@
 <html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8">
-    <title></title>
+    <title>Nearby</title>
     <script type="text/javascript">
       function getParameters(paramName) {
         var returnValue
@@ -72,13 +72,13 @@
       }
       .list {
         position:fixed;
-        padding: 10px 0px 10px 0px;
+        padding: 10px 5px 10px 5px;
         margin: 0 auto;
         width: 300px;
         background-color: white;
         right: -290px;
-        border-top-left-radius: 3px;
-        border-bottom-left-radius: 3px;
+        border-top-left-radius: 10px;
+        border-bottom-left-radius: 10px;
         -webkit-transition: right 1s, -webkit-transform 1s;
         transition: right 1s, transform 1s;
       }
@@ -89,8 +89,8 @@
         list-style: none;
         padding: 5px 10px 5px 10px;
         border: 1px solid rgb(209, 213, 218);
-        -webkit-transition: background-color 1s, -webkit-transform 1s;
-        transition: background-color 1s, transform 1s;
+        -webkit-transition: background-color 0.5s, -webkit-transform 0.5s;
+        transition: background-color 0.5s, transform 0.5s;
       }
       .list li:hover {
         background-color: rgb(209, 213, 218);
@@ -129,7 +129,8 @@
     </div>
     <div class="depth-1" id="map"></div>
     <script>
-    var geocoder, map, infoWindow, service, globalLocation;
+    var geocoder, map, infoWindow, service, globalLocation, marker;
+    var markers = [];
   // Initialize and add the map
       function initMap(location) {
         console.log(location + "sdfsdf")
@@ -137,7 +138,7 @@
           document.getElementById('map'),
           {zoom: 17.5, center: location, zoomControl: false, mapTypeControl: false, scaleControl: false, streetViewControl: false, fullscreenControl: false},
         );
-        var marker = new google.maps.Marker({position: location, map: map});
+        marker = new google.maps.Marker({position: location, map: map});
         infowindow = new google.maps.InfoWindow();
         service = new google.maps.places.PlacesService(map);
         globalLocation = new google.maps.LatLng(35.8026689, 125.6301435);
@@ -167,7 +168,6 @@
       $("form").on("submit", function(event) {
         event.preventDefault();
         mapchange("sdfjklsdfjlk");
-        console.log(document.getElementById('placeInput').value);
         if (document.getElementById('placeInput').value) {
           findPlace(document.getElementById('placeInput').value);
         }
@@ -207,7 +207,7 @@
       }
       function createMarker(place) {
               var placeLoc = place.geometry.location;
-              var marker = new google.maps.Marker({
+              marker = new google.maps.Marker({
                 map: map,
                 position: place.geometry.location
               });
@@ -219,9 +219,6 @@
             }
       window.onload = function() {
         geocoder = new google.maps.Geocoder();
-
-        console.log("window ready");
-        console.log('https://maps.googleapis.com/maps/api/geocode/json?address='+getParameters("gloc")+'&key=AIzaSyD09uANmgjeKZPBoOnGUYV2vkr4-ISXawo');
 
         mapchange();
         if (document.getElementById('locationInput').value !== "") {
