@@ -17,85 +17,7 @@
         }
       }
     </script>
-    <style>
-      body {
-        margin: 0px 0px 0px 0px;
-      }
-       /* Set the size of the div element that contains the map */
-      #map {
-        height: 100vh;  /* The height is 400 pixels */
-        width: 100vw;  /* The width is the width of the web page */
-      }
-      .depth-1 {
-        position: fixed;
-        z-index: 1;
-      }
-      .depth-20 {
-        position: fixed;
-        z-index: 20;
-      }
-      .depth-30 {
-        margin-top: 150px;
-        position: fixed;
-        z-index: 30;
-      }
-      .nearbyInput {
-        border: 0;
-        padding: 15px 10px 15px 10px;
-        width: 50vw;
-        text-align: center;
-        font-size: 20px
-      }
-      .nearbyDiv {
-        position: fixed;
-        margin-left: 25vw;
-      }
-      .nearbyBtn {
-        margin-left: 30px;
-        padding: 10px 20px 10px 20px;
-        margin-bottom: 7px;
-        border: 1px solid #3d414d;
-        color: white;
-        background-color: #3d414d;
-        -webkit-transition: background-color 1s, border 1s, -webkit-transform 1s;
-        transition: background-color 1s, border 1s, transform 1s;
-      }
-      .nearbyBtn:hover {
-        border: 1px solid #666e87;
-        background-color: #666e87;
-      }
-      .firstInput {
-        top: 30px;
-      }
-      .secondInput {
-        bottom: 30px;
-      }
-      .list {
-        position:fixed;
-        padding: 10px 5px 10px 5px;
-        margin: 0 auto;
-        width: 300px;
-        background-color: white;
-        right: -290px;
-        border-top-left-radius: 10px;
-        border-bottom-left-radius: 10px;
-        -webkit-transition: right 1s, -webkit-transform 1s;
-        transition: right 1s, transform 1s;
-      }
-      .list:hover {
-        right: 0px;
-      }
-      .list li {
-        list-style: none;
-        padding: 5px 10px 5px 10px;
-        border: 1px solid rgb(209, 213, 218);
-        -webkit-transition: background-color 0.5s, -webkit-transform 0.5s;
-        transition: background-color 0.5s, transform 0.5s;
-      }
-      .list li:hover {
-        background-color: rgb(209, 213, 218);
-      }
-    </style>
+    <link rel="stylesheet" href="./master.css">
     <script async defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD09uANmgjeKZPBoOnGUYV2vkr4-ISXawo&callback=initMap&libraries=places">
     </script>
@@ -125,7 +47,8 @@
       </div>
     </form>
     <div class='depth-30' id='list'>
-
+      <table>
+      </table>
     </div>
     <div class="depth-1" id="map"></div>
     <script>
@@ -133,40 +56,49 @@
     var markers = [];
   // Initialize and add the map
       function initMap(location) {
-        console.log(location + "sdfsdf")
         map = new google.maps.Map(
           document.getElementById('map'),
           {zoom: 17.5, center: location, zoomControl: false, mapTypeControl: false, scaleControl: false, streetViewControl: false, fullscreenControl: false},
         );
-        marker = new google.maps.Marker({position: location, map: map});
+        marker = new google.maps.Marker({position: location, animation: google.maps.Animation.DROP, map: map});
         infowindow = new google.maps.InfoWindow();
         service = new google.maps.places.PlacesService(map);
         globalLocation = new google.maps.LatLng(35.8026689, 125.6301435);
       }
-      function callback(results, status) {
-      if (status === google.maps.places.PlacesServiceStatus.OK) {
-        for (var i = 0; i < results.length; i++) {
-          createMarker(results[i]);
+      function setMapOnAll(map) {
+        for (var i = 0; i < markers.length; i++) {
+          markers[i].setMap(map);
         }
-        var output = '<ul class="list">';
-        for (var i = 0; i < results.length; i++) {
-          output += "<li>"+results[i].name+"</li>";
+      }
+      function mapchange(delta = null) {
+        if (delta === null) {
+          gloc = getParameters('gloc');
+        } else {
+          gloc = document.getElementById('locationInput').value;
         }
-        output += '</ul>';
-        document.getElementById('list').innerHTML = output;
-      }
-      }
-      function createMap() {
-
-        var location = {lat:35.8026689,lng:125.6301435};
-        map = new google.maps.Map(
-          document.getElementById('map'),
-          {zoom: 3, center: location, zoomControl: false, mapTypeControl: false, scaleControl: false, streetViewControl: false, fullscreenControl: false},
-        );
-        var marker = new google.maps.Marker({position: location, map: map});
+        if (typeof gloc != "undefined") {
+          if (gloc.split(',').length == 2) {
+            initMap({lat: gloc.split(',')[0], lng: gloc.split(',')[1]});
+          } else {
+            geocoder.geocode( { 'address': gloc }, function(results, status) {
+              if (status == 'OK') {
+                globalLocation = results[0].geometry.location;
+                map.setCenter(results[0].geometry.location);
+                marker = new google.maps.Marker({
+                  map: map,
+                  position: results[0].geometry.location
+                });
+              }
+            });
+          }
+        } else {
+          initMap({lat: 35.142839, lng: 126.800090});
+        }
       }
       $("form").on("submit", function(event) {
         event.preventDefault();
+        setMapOnAll(null);
+        markers = [];
         mapchange("sdfjklsdfjlk");
         if (document.getElementById('placeInput').value) {
           findPlace(document.getElementById('placeInput').value);
@@ -179,44 +111,37 @@
           type: place
         }, callback);
       }
-      function mapchange(delta = null) {
-        if (delta === null) {
-          gloc = getParameters('gloc');
-        } else {
-          gloc = document.getElementById('locationInput').value;
-          console.log(gloc);
-        }
-        if (typeof gloc != "undefined") {
-          if (gloc.split(',').length == 2) {
-            initMap({lat: gloc.split(',')[0], lng: gloc.split(',')[1]});
-          } else {
-            geocoder.geocode( { 'address': gloc }, function(results, status) {
-              if (status == 'OK') {
-                globalLocation = results[0].geometry.location;
-                map.setCenter(results[0].geometry.location);
-                var marker = new google.maps.Marker({
-                  map: map,
-                  position: results[0].geometry.location
-                });
-              }
-            });
+      function callback(results, status) {
+        if (status === google.maps.places.PlacesServiceStatus.OK) {
+          for (var i = 0; i < results.length; i++) {
+            createMarker(results[i]);
           }
-        } else {
-          initMap({lat: 35.142839, lng: 126.800090});
+          var n = results.length;
+          if (n > 17) {
+            n = 17;
+          }
+          var output = '<div class="list">';
+          for (var i = 0; i < n; i++) {
+            output += "<a target='_blank' href='https://www.google.com/search?q="+results[i].name+"'>"+results[i].name+"</a>";
+          }
+          output += '<a href="#"> * Blue: Tne Nearest Location</a></div>';
+          document.getElementById('list').innerHTML = output;
         }
       }
       function createMarker(place) {
-              var placeLoc = place.geometry.location;
-              marker = new google.maps.Marker({
-                map: map,
-                position: place.geometry.location
-              });
+        var placeLoc = place.geometry.location;
+        var marker = new google.maps.Marker({
+          position: {lat:placeLoc.lat(), lng:placeLoc.lng()},
+          animation: google.maps.Animation.DROP,
+          map: map
+        });
+        markers.push(marker);
 
-              google.maps.event.addListener(marker, 'click', function() {
-                infowindow.setContent(place.name);
-                infowindow.open(map, this);
-              });
-            }
+        google.maps.event.addListener(marker, 'click', function() {
+          infowindow.setContent("<a target='_blank' href='https://www.google.com/search?q="+place.name+"'>"+place.name+"</a>");
+          infowindow.open(map, this);
+        });
+      }
       window.onload = function() {
         geocoder = new google.maps.Geocoder();
 
